@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState ,useRef} from 'react';
 import './App.css';
 
 function App() {
@@ -6,21 +6,30 @@ function App() {
   const [todo,setTodo] = useState('')
   const [edittodo,setEdittodo] = useState(null)
 
+  const ref = useRef()
+
   const handleinput = (e) =>{
     setTodo(e.target.value)
   }
+  
 
   const addTodo=()=>{
     const updatedtodo = [...todos]
     if (edittodo == null && todo && (!updatedtodo.includes(todo)) ){
       setTodos([...todos,todo]);
       setTodo('')
-    }else if(edittodo !== null && (!updatedtodo.includes(todo)) && todo){
+    }else if(edittodo !== null && (updatedtodo.includes(todo)) && todo){
       updatedtodo[edittodo] = todo
       setTodos(updatedtodo)
       setTodo('')
       setEdittodo(null)     
-    }else{
+    }else if(edittodo !== null && (!updatedtodo.includes(todo)) && todo){
+      updatedtodo[edittodo] = todo
+      setTodos(updatedtodo)
+      setTodo('')
+      setEdittodo(null)
+    }
+    else{
       alert('Already used or null value')
     }
   }
@@ -34,7 +43,12 @@ function App() {
   const updateTodo = (index) =>{
     setEdittodo(index)
     setTodo(todos[index])
+    ref.current.focus()
   }
+  const canceledit = () =>{
+    setTodo('')
+  }
+  
   
   return (
     <div className="App">
@@ -42,12 +56,13 @@ function App() {
 
         <h1 className='h1'>Todo</h1>
         <div className='Type'>
-          <input value={todo} onChange={handleinput} placeholder={'Type here'} required></input>
+          <input value={todo} ref={ref} onChange={handleinput} placeholder={'Type here'} required></input>
+          <button onClick={canceledit}>cancel</button>
           <button onClick={addTodo} >Add</button>
         </div>
       </div>
 
-      {todos.reverse().map((values,index)=>{
+      {todos.map((values,index)=>{
         return ( 
         <div key={index} className='h2'>
           {values}  <div className='icons'> <i onClick={()=>updateTodo(index)} class="fa-solid fa-pencil"></i></div><div><i onClick={()=>deletetodo(index)} className="fa-solid fa-trash"></i></div>
